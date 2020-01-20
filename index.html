@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+		<!-- jQUERY -->
+		<script
+			src="https://code.jquery.com/jquery-3.2.1.min.js"
+			integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			crossorigin="anonymous"
+		></script>
+
+		<title>Document</title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="w3-row">
+				<div class="w3-col m8">
+					<div id="mywebcam"></div>
+					<p>
+						<button
+							onclick="takescreenshot()"
+							class="w3-button w3-blue"
+						>
+							Take Snapshot [experiment]
+						</button>
+					</p>
+				</div>
+				<div class="w3-col m4" onload="takescreenshot()">
+					<div id="result">Your Capture Image here</div>
+					<a id="img_link"></a>
+				</div>
+			</div>
+		</div>
+		<script src="webcam.min.js"></script>
+		<script>
+			//setting webcam attributes
+			Webcam.set({
+				width: 600,
+				height: 400,
+				image_format: 'jpeg',
+				jpeg_quality: 90
+			})
+			//attacing webcam in mywebcam div element
+			Webcam.attach('#mywebcam')
+			//init for setTimeInterval
+			var timeout = 0
+
+			//getting interval id and executing fn of webcam snap
+			var refreshIntervalId = setInterval(() => {
+				Webcam.snap(data_uri => {
+					document.getElementById('result').innerHTML =
+						"<h2>here is your image uri '" +
+						data_uri +
+						"':</h2><img width='300' src='" +
+						data_uri +
+						"'>"
+					var link = document.createElement('a')
+					link.download = 'tset'
+					link.target = '_blank'
+
+					// Construct the URI
+					link.href = data_uri
+					document.body.appendChild(link)
+					//downloding
+					link.click()
+
+					// Cleanup the DOM
+					document.body.removeChild(link)
+					delete link
+					timeout++
+					if (timeout === 3) {
+						/* later  after downloading  four pic it is stopped*/
+						clearInterval(refreshIntervalId)
+						timeout = 0
+						// shut down camera, stop capturing
+						Webcam.reset()
+					}
+				})
+			}, 3000)
+		</script>
+	</body>
+</html>
